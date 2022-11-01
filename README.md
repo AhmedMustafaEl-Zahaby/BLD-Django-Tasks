@@ -4,10 +4,9 @@ For this task and the following ones, we'll try to build a music platform on whi
 and put up their albums for sale
 
 1. Create a personal repository on GitLab called `django-training`
-2. Add amr.bahaa@bld.ai as maintainers to your repository (Project Information => Members => Invite members)
-3. Create a Django project under the repository called `musicplatform`
-4. Create an app `artists`
-5. In `artists` Create an `Artist` model with the following fields (make the right assumptions)
+2. Create a Django project under the repository called `musicplatform`
+3. Create an app `artists`
+4. In `artists` Create an `Artist` model with the following fields (make the right assumptions)
    - Stage name
      - required
      - unique
@@ -16,8 +15,8 @@ and put up their albums for sale
      - This field is to store each artist's social media profile (e.g. https://www.instagram.com/drake/)
      - What is a suitable field for this type of data?
      - This field is optional, but it shouldn't be null ([why?](https://docs.djangoproject.com/en/4.0/ref/models/fields/#null))
-6. Create an app `albums`
-7. In `albums`, Create an `Album` model with the following fields (you might think it's an overkill creating a whole app for one model, for the sake of this practice we could have added the `Album` model to the `artists` app, but in the real world, think of how your app will scale if there are multiple types of artists, each with its own model, for example `GuestArtist`, and multiple types of albums, each with its own model)
+5. Create an app `albums`
+6. In `albums`, Create an `Album` model with the following fields (you might think it's an overkill creating a whole app for one model, for the sake of this practice we could have added the `Album` model to the `artists` app, but in the real world, think of how your app will scale if there are multiple types of artists, each with its own model, for example `GuestArtist`, and multiple types of albums, each with its own model)
    - an artist can have `0 or many` albums, an album must have an artist associated with it
    - name (if name is not provided, it should be called `New Album`)
    - creation datetime (the date when the album instance is created and stored in the database) (hint: respect the timezone)
@@ -25,8 +24,8 @@ and put up their albums for sale
    - cost
      - required
      - use what you find suitable between `FloatField` and `DecimalField`
-8. Create a `RESULTS.md` under `musicplatform/`
-9. using `manage.py shell` (type the queries you used and their results in `RESULTS.md`):
+7. Create a `RESULTS.md` under `musicplatform/`
+8. using `manage.py shell` (type the queries you used and their results in `RESULTS.md`):
    - create some artists
    - list down all artists
    - list down all artists sorted by name
