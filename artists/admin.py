@@ -11,11 +11,10 @@ class AlbumInline(admin.TabularInline):
     form = AlbumForm
     extra =  0
 
-
 class ArtistAdmin(admin.ModelAdmin):
-    def albums_count(self, Artist):
+    def approved_albums(self, Artist):
         return Artist.Album.filter(propriet = True).count()
-    list_display = ('Stage_name', 'albums_count')
+    list_display = ('Stage_name', 'approved_albums')
     fields = ["Stage_name" , "Social_link"]
     inlines = [AlbumInline]
 
