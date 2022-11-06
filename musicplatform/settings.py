@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     "ImageKit",
     'rest_framework',
     'users',
+    'authentication',
+    'rest_framework.authtoken',
+    'knox',
 ]
 
 MIDDLEWARE = [

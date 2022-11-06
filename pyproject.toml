@@ -14,6 +14,7 @@ image-kit = "^0.0.3"
 djangorestframework = "^3.14.0"
 pillow = "^9.3.0"
 django-imagekit = "^4.1.0"
+django-rest-knox = "^4.2.0"
 
 
 [build-system]
