@@ -1,43 +1,24 @@
 ## Task
 
-1. Remove any apps/views that we created from before that have to do with authenticating users
-2. Create an app `users`
-3. In the `users` app, extend Django's user model by inheriting from `AbstractUser` to include an optional `bio` `CharField` with a max length of 256 characters
-   - On django admin, this field should be displayed as a `TextArea`
-   - You might want to delete all the migration files you have and leverage `reset_db` shell command to extend the user model. [Why?](https://docs.djangoproject.com/en/4.0/topics/auth/customizing/#changing-to-a-custom-user-model-mid-project)
-   - _May I delete the migration files when working on a project?_ **NEVER** delete the migrations files without consulting your team first, migrations files serve as version control for your models, sometimes you might want to set a model's state to a snapshot from that past, by deleting migration files you lose access to that. In addition to that, not all migration files can be automatically generated, there are manually created migration files like data migration files, if you delete data migration files you're deleting code from the codebase.
-   - _Why are we allowed to delete migration files now then?_ This purely for the purpose of this task.
-4. Create an app `authentication`
-5. In the `authentication` app, support a `POST authentication/register/` endpoint that creates users.
-   - Think about the suitable permission class(es) for this endpoint.
-   - This endpoint must accept the following fields formatted in JSON:
-     - username
-     - email
-     - password1
-     - password2 (confirmation of `password1`)
-   - Perform proper validation on all fields **including** letting the user know if their password isn't strong enough or if password1 doesn't match password2.
-   - Make sure passwords are being hashed and email domains are stored in lowercase. (hint: use `create_user`)
-6. Create a `POST authentication/login/` that logs in users using their username and password and returns a `KnoxToken` and the user's data in a nested object.
+1. Under each app that we have, create a `tests` directory and don't forget `__init__.py`
+2. If the app has endpoints, create a file `tests/test_endpoints.py` or `tests/test_views.py`
+3. Create a global fixture `auth_client` that returns a function, if that function is passed a user instance, it'll return an instance of DRF's `APIClient` authenticated by that user instance, otherwise, it'll return an instance of `APIClient` authenticated by an arbitrary user instance. example:
 
 ```
-{
-    "token": <knox_token>
-    "user": {
-        "id": 1,
-        "username": "my_user"
-        "email": "email@email.com"
-        "bio": "my sample bio"
-}
+def test_something(api_client):
+    client = api_client(user)
+    # or
+    client = api_client()
+
+
+    client.get(url)
 ```
 
-6. Create a `POST authentication/logout/` endpoint that logs the user out from the app by invalidating the knox token
-7. In the `users` app, create a user detail endpoint `/users/<pk>` that supports the following requests:
-   _ `GET` returns the user data matching the given `pk`, namely, it should return the user's `id`, `username`, `email`, and `bio`.
-   _ return 404 status code if the user with the given `pk` does not exist
-   _ Support updating the `bio`, `username`, and `email` fields via the following requests:
-   _ `PUT` This is exactly the same as when creating a user except that an ID of an existing user is
-   provided in the URL, and that the request will overwrite the user's data with that given ID.
-   _ `PATCH` This is exactly the same as when updating a user except none of the fields are required,
-   and that only fields given a value will be updated. (hint: see `partial_update` in serializers)
-   _ Allow update requests if the user making the request is the user in the `<pk>` of the url.
-8. Add `TokenAuthentication` to the default authentication classes
+3. For each endpoint, test the following:
+   - If the view has permission classes, test making requests that will obey and disobey the permissions, For example, if a view has `IsAuthenticatedOrReadOnly` permission class, test that making a write and non-authenticated request will return `403 Forbidden` status code
+   - If the view is expecting a certain set of required fields, test that making a request with one or more missing fields will return `400` status code and a proper error message
+   - If a view is expected to return a set of fields, test that these fields are indeed returned, and that their values match what you expect. For example, if I make a request to `/users/1` I expect that the data returned will be that that of the user whose id is 1
+4. Your grade will be affected if a test fails.
+5. _What is the purpose of all of this?_ Testing is one of the essential tools for building a high quality & solid software, mainly, we write tests for the 2 following reasons:
+   - Making sure our software behaves as expected when we support a new feature for the first time
+   - Making sure our software still behaves as expected when we modify an existing feature
