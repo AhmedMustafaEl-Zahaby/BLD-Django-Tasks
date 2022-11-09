@@ -14,11 +14,7 @@ def test_something(api_client):
     client.get(url)
 ```
 
-3. For each endpoint, test the following:
+4. For each endpoint, test the following:
    - If the view has permission classes, test making requests that will obey and disobey the permissions, For example, if a view has `IsAuthenticatedOrReadOnly` permission class, test that making a write and non-authenticated request will return `403 Forbidden` status code
    - If the view is expecting a certain set of required fields, test that making a request with one or more missing fields will return `400` status code and a proper error message
    - If a view is expected to return a set of fields, test that these fields are indeed returned, and that their values match what you expect. For example, if I make a request to `/users/1` I expect that the data returned will be that that of the user whose id is 1
-4. Your grade will be affected if a test fails.
-5. _What is the purpose of all of this?_ Testing is one of the essential tools for building a high quality & solid software, mainly, we write tests for the 2 following reasons:
-   - Making sure our software behaves as expected when we support a new feature for the first time
-   - Making sure our software still behaves as expected when we modify an existing feature
