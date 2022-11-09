@@ -1,10 +1,9 @@
-import pytest
-
 from users.models import User
 from knox.auth import AuthToken
 from rest_framework.test import APIClient
+import pytest
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def auth_client(user = None):
     def Auth_client(user = None):
         if user == None:

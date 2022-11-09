@@ -3,10 +3,10 @@ from rest_framework import status
 from ..models import *
 from rest_framework.test import APIClient
 
+endpoint = '/artist/'
 
 @pytest.mark.django_db
 def test_sucess_retrieve():
-    endpoint = '/artist/'
     templete = {
         "Stage_name" : "ahmedMustag",
         "Social_link" : "https://www.youtube.com/watch?v=LYX6nlECcro"
@@ -33,7 +33,6 @@ def  test_fail_retrieve(client):
 @pytest.mark.django_db
 def test_sucess_creation():
     client = APIClient()
-    endpoint = "/artist/"
     templete = {
         "Stage_name" : "ahmedMustag",
         "Social_link" : "https://www.youtube.com/watch?v=LYX6nlECcro"
@@ -45,7 +44,6 @@ def test_sucess_creation():
 @pytest.mark.django_db
 def test_create_failed():
 
-    endpoint = '/artist/'
     templete = {
         "Stage_name" : "Ahmed El-Zahaby",
         "Social_link" : "www.facebook.com/123"
@@ -54,13 +52,14 @@ def test_create_failed():
     response = client.post(f'{endpoint}', {})
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    #ALready Registered User
+    response = client.post(f'{endpoint}', templete)
     response = client.post(f'{endpoint}', templete)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db
 def test_sucess_update():
-    endpoint = '/artist/'
     templete = {
         "Stage_name" : "ahmedMustag",
         "Social_link" : "https://www.youtube.com/watch?v=LYX6nlECcro"
@@ -79,7 +78,7 @@ def test_sucess_update():
 
 @pytest.mark.django_db
 def test_fail_update():    
-    endpoint = '/artist/'
+
     templete = {
         "Stage_name" : "ahmedMustag",
         "Social_link" : "https://www.youtube.com/watch?v=LYX6nlECcro"
@@ -100,7 +99,6 @@ def test_fail_update():
 @pytest.mark.django_db
 def test_sucess_delete():
 
-    endpoint = '/artist/'
     templete = {
         "Stage_name" : "ahmedMustag",
         "Social_link" : "https://www.youtube.com/watch?v=LYX6nlECcro"
@@ -117,8 +115,8 @@ def test_sucess_delete():
     response = client.get(f'{endpoint}1')
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
+
 def test_fail_delete():
-    endpoint = '/artist/'
     client = APIClient()
     response = client.delete(f'{endpoint}/1')
     assert response.status_code == status.HTTP_404_NOT_FOUND
