@@ -4,6 +4,12 @@ from datetime import  datetime
 from artists.models import Artist
 from django.core.validators import FileExtensionValidator
 from ImageKit.models import ImageSpecField
+
+class AlbumManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(propriet = True)
+
+
 class Album(models.Model):
     name = models.CharField(max_length = 255 , default="New Album")
     creation_datetime = models.DateTimeField(default=datetime.now())
@@ -11,6 +17,8 @@ class Album(models.Model):
     cost = models.IntegerField(null = True)
     propriet = models.BooleanField(default = False)
     artist = models.ForeignKey(Artist , related_name = 'Album' , on_delete = models.CASCADE)
+    objects = AlbumManager()
+
 
     def __str__(self):
         return self.name
