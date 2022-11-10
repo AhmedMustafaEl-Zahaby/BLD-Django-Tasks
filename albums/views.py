@@ -4,25 +4,18 @@ from .models import Album
 from django.http import JsonResponse
 from django.core import serializers
 from .form import *
+from rest_framework import generics , mixins, pagination, permissions
+from .serializers import *
 import json
 
-class AlbumView(View):
-    def get(self , request):
-        data = serializers.serialize('json' , Album.objects.all())
-        return JsonResponse(json.loads(data) , safe=False)
-
-
-    def post(self , request):
-        try:
-            form = AlbumForm(data = json.loads(request.body))
-            if form.is_valid():
-                form.save()
-                return JsonResponse(form.data)
-            return JsonResponse(form.error , status=422)
-
-        except :
-            return JsonResponse({"Message": "Unknown Format"} , status=500)
-
+class AlbumView(generics.GenericAPIView,
+                    mixins.ListModelMixin,):
+    queryset = Album.objects.filter(propriet = True)
+    serializer_class = AlbumSerializer
+    pagination_class = pagination.LimitOffsetPagination
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    def get(self, request):
+        return self.list(request)
 
 class AlbumDetailView(View):
     def get(self , request , id):
