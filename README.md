@@ -1,63 +1,27 @@
 ## Task
 
-1. Add a relationship field to the `Artist` model that maps an artist to a user instance.
-   - Hint: Think carefully about the relationship type you'll use
-   - This field should support the following statement: **All artists are users but not all users are artists**
-   - When running your migrations, django will complain that you already have artists stored in your database and it doesn't know what to do with them since they aren't mapped to a user model which goes against the relationship you just created assuming this relationship is not nullable. Feel free to reset your database and delete the migrations _or_ make this field nullable
-2. Create an endpoint `/albums/`
-
-   - `GET` should return a list of **approved** albums
-
-     - Each album should be a JSON object that looks like this:
-
-     ```
-     {
-         "id": ...,
-         "artist": {
-             "id": ...,
-             "stage_name": ...,
-             ...
-         },
-         "name": ...,
-         "release_datetime": ...,
-         "cost": ...,
-
-     }
-     ```
-
-     - Permit any type of request whether it's authenticated or not.
-     - It doesn't make sense to return all albums that we have to the frontend at once, if we have hundreds of thousands of albums, the user's screen will not be able to render that much data, instead we should support pagination.
-       - Support `LimitOffsetPagination` for this view.
-     - Bonus: Can you create and use custom queryset manager that only returns approved albums?
-
-   - `POST` should accept a JSON body, create an album, and raise proper validation errors for all fields
-     - The request body should look like:
-     ```
-     {
-         "name": ...,
-         "release_datetime": ...,
-         "cost": ...,
-     }
-     ```
-     - Permit only authenticated requests
-     - The request must be authenticated by a user who is also an artist
-     - The created album will be mapped to the artist who made the request
-     - `403 Forbidden` error should be raised if a `POST` request is not authenticated or if it's authenticated by a user who isn't an artist
-
-3. Using `django-filter`, support the following optional filters for `GET` requests:
-   - Cost greater than or equal
-   - Cost less than or equal
-   - Case-insensitive containment
-     - If I have 2 albums named `OK` and `ok`, both should be returned in the response if I filter by `name=ok`
-   - Example usage:
-     - `/albums/?cost__gte=10&cost__lte=50&name="Album"` This should return all albums within the cost range of 10 and 50 price units inclusive and whose names contain the word `Album` with case insensitivity.
-     - `/albums/?cost__lte=100` This should return all albums with a cost less than 100 price units.
-   - _Why are IDs passed as url kwargs `/albums/<pk>` but filters are passed as query params `/albums?name="Album"`? What stops us from doing something like `/albums?id=5`_ **The convention in Django is to pass unique identifiers as url kwargs and non unique identifiers as query params.**
-4. Create another endpoint that supports that same exact features as the `/albums/` endpoint when it receives a `GET` request but implement the filters manually.
-   - Raise a validation error if I don't respect the filter's data type, for example if I pass a string to the cost filter.
-5. Under `albums/tests` create `test_serializers.py` to test the serializer class (don't make requests to any endpoints)
-   - Test that your album serializer serializes the album instance properly and returns the expected data
-   - Test that your album serializer deserializes (creates) an album instance properly from given data dictionary and http request
-6. Under `albums/tests` create `test_endpoints.py`
-   - Test that the view(s) use(s) the expected serializer(s).
-   - Test proper response status codes for permitted and unpermitted requests
+1. Install `redis-server` on your machine
+2. Install `celery` as a project dependency
+3. Install `redis` as a project dependency
+4. Integrate celery with the project
+   - Allow for defining celery config options in `settings.py` module
+   - Celery config options should have the prefix `CELERY_CONF`
+     - for example: `CELERY_CONF_TIMEZONE`, `CELERY_CONF_RESULT_BACKEND`
+5. Setup a gmail email to use for this project to send emails from
+6. Use `django-environ` to import your secure environment variables like the redis server address or email credentials
+7. Define a task in `albums/tasks.py` or whatever `related_name` you provided for celery's `autodiscover_tasks()` method
+8. Define a task that receives the artist and album data you need as arguments and send the artist a congratulation email.
+   - remember: the data the task receives must be serializable
+9. Use a post-save signal or override `Album.save()` and each time an album is created **asynchronously call** the task that you defined in the previous step
+10. Define another task that achieves `Use case 2.` and use celery's default beat scheduler `PersistentScheduler` to run the task every 24 hours
+    - Define the `beat_schedule` in `settings.py` like so:
+    ```
+    CELERY_CONF_BEAT_SCHEDULE = {
+        'add-every-30-seconds': {
+            'task': 'tasks.add',
+            'schedule': 30.0,
+            'args': (16, 16)
+        },
+    }
+    ```
+    - Read: There is another way to define periodic tasks during runtime by storing the beat schedule in django's database and using django admin to define each task's schedule. See [`django-celery-beat`](https://docs.celeryq.dev/en/latest/userguide/periodic-tasks.html#using-custom-scheduler-classes)

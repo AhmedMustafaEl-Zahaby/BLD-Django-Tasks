@@ -11,9 +11,13 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+# import os, environ
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+# ENV = environ.Env()
+# ENV.read_env(os.path.join(BASE_DIR, '', '.env'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -131,3 +135,13 @@ AUTH_USER_MODEL = 'users.User'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+
+CELERY_CONF_BEAT_SCHEDULE = {
+    'send-email-every-day-at-midnight': {
+        'task' : 'albums.tasks.send_mail_every_day_task',
+        'schedule' : crontab(hour=0, minute=0),
+    }
+}
