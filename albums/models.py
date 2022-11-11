@@ -1,4 +1,3 @@
-from email.policy import default
 from django.db import models
 from datetime import  datetime
 from artists.models import Artist
